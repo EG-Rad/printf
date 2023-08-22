@@ -1,5 +1,6 @@
 #include <stdarg.h>
 #include <unistd.h>
+#include "main.h"
 
 /**
  * _printf - Custom printf function with limited format specifiers.
@@ -21,13 +22,13 @@ int _printf(const char *format, ...)
         {
             p++;
 
-            if (*p == 'c')  // Handle %c
+            if (*p == 'c')  
             {
                 char c = va_arg(args, int);
                 write(1, &c, 1);
                 printed_chars++;
             }
-            else if (*p == 's')  // Handle %s
+            else if (*p == 's') 
             {
                 char *s = va_arg(args, char *);
                 while (*s)
@@ -37,7 +38,7 @@ int _printf(const char *format, ...)
                     printed_chars++;
                 }
             }
-            else if (*p == '%')  // Handle %%
+            else if (*p == '%')  
             {
                 write(1, p, 1);
                 printed_chars++;
