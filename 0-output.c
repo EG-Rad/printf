@@ -1,82 +1,89 @@
-#include <stdio.h>
 #include <stdarg.h>
+#include <stdio.h>
+#include <unistd.h>
 #include "main.h"
 
 /**
- * print_char - Print a character
- * @c: The character to print
+ * handle_char - Handles the %c conversion specifier
+ * @args: The argument list
  * @count: Pointer to the count of characters printed
  */
-void print_char(char c, int *count)
+
+void handle_char(va_list args, int *count)
 {
-	putchar(c);
+	char c = va_arg(args, int);
+
+	write(1, &c, 1);
 	(*count)++;
 }
 
 /**
- * print_str - Print a string
- * @str: The string to print
+ * handle_string - Handles the %s conversion specifier
+ * @args: The argument list
  * @count: Pointer to the count of characters printed
  */
-void print_str(const char *str, int *count)
+
+void handle_string(va_list args, int *count)
 {
-	*count += printf("%s", str);
+	char *s = va_arg(args, char *);
+
+	while (*s)
+	{
+		write(1, s, 1);
+		s++;
+		(*count)++;
+	}
 }
 
 /**
- * print_int - Print an integer
- * @n: The integer to print
+ * handle_percent - Handles the %% conversion specifier
  * @count: Pointer to the count of characters printed
  */
-void print_int(int n, int *count)
+
+void handle_percent(int *count)
 {
-	*count += printf("%d", n);
+	write(1, "%", 1);
+	(*count)++;
 }
 
 /**
- * _printf - Custom printf function that handles %c, %s, %d, %i
+ * _printf - Produces output according to a format
  * @format: The format string
- * @...: Additional arguments based on format string
  *
- * Return: The number of characters printed (excluding null byte)
+ * Return: The number of characters printed
+ * (excluding the null byte used to end output to strings)
  */
+
 int _printf(const char *format, ...)
 {
 	va_list args;
-
-	va_start(args, format);
 	int count = 0;
 
-	while (*format != '\0')
+	va_start(args, format);
+	while (*format)
 	{
 		if (*format == '%')
 		{
 			format++;
-
 			switch (*format)
 			{
 				case 'c':
-					print_char(va_arg(args, int), &count);
+					handle_char(args, &count);
 					break;
 				case 's':
-					print_str(va_arg(args, char *), &count);
-					break;
-				case 'd':
-				case 'i':
-					print_int(va_arg(args, int), &count);
+					handle_string(args, &count);
 					break;
 				case '%':
-					print_char('%', &count);
+					handle_percent(&count);
 					break;
 				default:
-					print_char('%', &count);
-					print_char(*format, &count);
 					break;
 			}
 		}
 		else
 		{
-			print_char(*format, &count);
+			write(1, format, 1);
+			count++;
 		}
 		format++;
 	}
